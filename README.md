@@ -1,3 +1,3 @@
 # Chess
-A simple chess board game.
+A simple chess game.
 baad me daaluga😪
