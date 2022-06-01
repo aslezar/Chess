@@ -1,7 +1,4 @@
 #include <iostream>
-#include <iomanip>
-using namespace std;
-
 int A[8][8] = {0};
 struct coordinates
 {
@@ -15,14 +12,14 @@ enum piecenames
     rookb,
     knightb,
     bishopb,
-    queenb,
     kingb,
+    queenb,
     pawnw,
     rookw,
     knightw,
     bishopw,
-    queenw,
     kingw,
+    queenw
 };
 
 class pieces
@@ -64,7 +61,7 @@ public:
 };
 class knight : public pieces
 {
-    bool isleft; // 0 for right and 1 for left
+    bool isleft; // 0 for right and 1 for isleft
 public:
     knight(bool,bool);
     void setposition(coordinates a);
@@ -84,32 +81,6 @@ public:
     bishop(bool,bool);
     void setposition(coordinates a);
 };
-
-int main(int argc, char **argu)
-{
-    cout << "Hello World\n";
-    pawn wpawn[] = {pawn(1, 0), pawn(1, 1), pawn(1, 2), pawn(1, 3), pawn(1, 4), pawn(1, 5), pawn(1, 6), pawn(1, 7)};
-    pawn bpawn[] = {pawn(0, 0), pawn(0, 1), pawn(0, 2), pawn(0, 3), pawn(0, 4), pawn(0, 5), pawn(0, 6), pawn(0, 7)};
-    queen bqueen(0), wqueen(1);
-    king bking(0), wking(1);
-    knight blknight(0,1),brknight(0,0), wlknight(1,1),wrknight(1,0);
-    bishop blbishop(0,1),brbishop(0,0), wlbishop(1,1),wrbishop(1,0);
-    rook blrook(0,1),brrook(0,0), wlrook(1,1),wrrook(1,0);
-
-    // for(int i=0;i<8;i++)
-    // {
-    //     wpawn[i].setposition(i);
-    // }
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-            cout << setw(3) << A[i][j];
-        cout << endl;
-    }
-    return 0;
-}
-
-/**********************************************************************/
 void pieces::setcolor(bool a)
 {
     color = a;
@@ -184,11 +155,11 @@ knight ::knight(bool c, bool d)
 {
     setcolor(c);
     isleft=d;
-    if (c && left)
+    if (c && isleft)
         setposition({0, 1});
     else if (c)
         setposition({0, 6});
-    else if (left)
+    else if (isleft)
         setposition({7, 1});
     else
         setposition({7, 6});
@@ -197,11 +168,11 @@ bishop ::bishop(bool c, bool d)
 {
     setcolor(c);
     isleft=d;
-    if (c && left)
+    if (c && isleft)
         setposition({0, 2});
     else if (c)
         setposition({0, 5});
-    else if (left)
+    else if (isleft)
         setposition({7, 2});
     else
         setposition({7, 5});
@@ -210,11 +181,11 @@ rook ::rook(bool c, bool d)
 {
     setcolor(c);
     isleft=d;
-    if (c && left)
+    if (c && isleft)
         setposition({0, 0});
     else if (c)
         setposition({0, 7});
-    else if (left)
+    else if (isleft)
         setposition({7, 0});
     else
         setposition({7, 7});
