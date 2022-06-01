@@ -1,5 +1,5 @@
 
-#include "pieces.h"
+#include "Pieces.h"
 #include <iomanip>
 using namespace std;
 
