@@ -15,6 +15,7 @@ void DisplayBoard()
 }
 
 bool move(int a[4]) {
+    return 0;
 
 }
 
@@ -47,7 +48,7 @@ int main(int argc, char argu)
         cin >> a[2] >> a[3];
         move(a);
         DisplayBoard();
-        cout << "Do you want to make another move(1/0) : ";
+        cout << "Do you want to make another move(0/1) : ";
         cin >> n;
 
     } while (n);
