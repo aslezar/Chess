@@ -1,4 +1,3 @@
-#include <iostream>
 int A[8][8] = {0};
 struct coordinates
 {
@@ -8,24 +7,44 @@ struct coordinates
 
 enum piecenames
 {
-    pawnb = 1,
-    rookb,
-    knightb,
-    bishopb,
+    pawnb1 = 1,
+    pawnb2,
+    pawnb3,
+    pawnb4,
+    pawnb5,
+    pawnb6,
+    pawnb7,
+    pawnb8,
+    rookbl,
+    knightbl,
+    bishopbl,
     kingb,
     queenb,
-    pawnw,
-    rookw,
-    knightw,
-    bishopw,
+    rookbr,
+    knightbr,
+    bishopbr,
+    pawnw1,
+    pawnw2,
+    pawnw3,
+    pawnw4,
+    pawnw5,
+    pawnw6,
+    pawnw7,
+    pawnw8,
+    rookwl,
+    knightwl,
+    bishopwl,
     kingw,
-    queenw
+    queenw,
+    rookwr,
+    knightwr,
+    bishopwr,
 };
 
 class pieces
 {
     coordinates position;
-    bool color; // Black for 0 , white:1
+    bool iswhite; // Black for 0 , white:1
 public:
     void setposition(coordinates a);
     // void possiblemove();
@@ -33,24 +52,29 @@ public:
     bool getcolor();
     void setcolor(bool);
     // void possiblemove();
+    void move(coordinates);
 };
+
+/***************************************DERIVED CLASSES**********************************/
 
 class pawn : public pieces
 {
     bool firstMove;
+    
 
 public:
     pawn(bool, int);
     void setposition(coordinates);
-    //  void possiblemove();
+    // void move(coordinates);
+    // void possiblemove();
     // pawn();
 };
-
 class queen : public pieces
 {
 public:
     queen(bool);
     void setposition(coordinates a);
+    // void move(coordinates);
 };
 
 class king : public pieces
@@ -58,56 +82,58 @@ class king : public pieces
 public:
     king(bool);
     void setposition(coordinates a);
+    // void move(coordinates);
 };
 class knight : public pieces
 {
     bool isleft; // 0 for right and 1 for isleft
 public:
-    knight(bool,bool);
+    knight(bool, bool);
     void setposition(coordinates a);
+    // void move(coordinates);
 };
 class rook : public pieces
 {
     bool isleft;
+
 public:
-    rook(bool,bool);
+    rook(bool, bool);
     void setposition(coordinates a);
+    // void move(coordinates);
 };
 class bishop : public pieces
 {
     bool isleft;
 
 public:
-    bishop(bool,bool);
+    bishop(bool, bool);
     void setposition(coordinates a);
+    // void move(coordinates);
 };
+
+/***********************************PIECES FUNCTIONS**************************/
 void pieces::setcolor(bool a)
 {
-    color = a;
+    iswhite = a;
 }
 
 bool pieces ::getcolor()
 {
-    return color;
+    return iswhite;
 }
 
-void pieces ::setposition(coordinates a)
-{
-    position = a;
-}
-
-void pawn ::setposition(coordinates a)
-{
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = pawnw;
-    else
-        A[a.x][a.y] = pawnb;
-}
 coordinates pieces::getposition()
 {
     return position;
 }
+void pieces::move(coordinates a)
+{
+    coordinates x = getposition();
+    A[x.x][x.y] = 0;
+    setposition(a);
+}
+
+/*************************************CONSTRUCTORS******************************/
 pawn ::pawn(bool c, int y)
 {
     setcolor(c);
@@ -135,14 +161,6 @@ queen ::queen(bool c)
     else
         setposition({7, 4});
 }
-void queen::setposition(coordinates a)
-{
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = queenw;
-    else
-        A[a.x][a.y] = queenb;
-}
 king ::king(bool c)
 {
     setcolor(c);
@@ -154,7 +172,7 @@ king ::king(bool c)
 knight ::knight(bool c, bool d)
 {
     setcolor(c);
-    isleft=d;
+    isleft = d;
     if (c && isleft)
         setposition({0, 1});
     else if (c)
@@ -167,7 +185,7 @@ knight ::knight(bool c, bool d)
 bishop ::bishop(bool c, bool d)
 {
     setcolor(c);
-    isleft=d;
+    isleft = d;
     if (c && isleft)
         setposition({0, 2});
     else if (c)
@@ -180,7 +198,7 @@ bishop ::bishop(bool c, bool d)
 rook ::rook(bool c, bool d)
 {
     setcolor(c);
-    isleft=d;
+    isleft = d;
     if (c && isleft)
         setposition({0, 0});
     else if (c)
@@ -189,6 +207,29 @@ rook ::rook(bool c, bool d)
         setposition({7, 0});
     else
         setposition({7, 7});
+}
+
+/**********************************SETPOSITION***********************/
+void pieces ::setposition(coordinates a)
+{
+    position = a;
+}
+
+void pawn ::setposition(coordinates a)
+{
+    pieces::setposition(a);
+    if (getcolor())
+        A[a.x][a.y] = pawnw;
+    else
+        A[a.x][a.y] = pawnb;
+}
+void queen::setposition(coordinates a)
+{
+    pieces::setposition(a);
+    if (getcolor())
+        A[a.x][a.y] = queenw;
+    else
+        A[a.x][a.y] = queenb;
 }
 void rook::setposition(coordinates a)
 {
@@ -222,3 +263,5 @@ void king::setposition(coordinates a)
     else
         A[a.x][a.y] = kingb;
 }
+
+/***************************************************/
