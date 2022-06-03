@@ -1,4 +1,5 @@
-int A[8][8] = {0};
+class pieces;
+pieces *board[8][8] = {0};
 struct coordinates
 {
     int x; // row
@@ -7,52 +8,29 @@ struct coordinates
 
 enum piecenames
 {
-    pawnb1 = 1,
-    pawnb2,
-    pawnb3,
-    pawnb4,
-    pawnb5,
-    pawnb6,
-    pawnb7,
-    pawnb8,
-    rookbl,
-    knightbl,
-    bishopbl,
-    kingb,
-    queenb,
-    rookbr,
-    knightbr,
-    bishopbr,
-    pawnw1,
-    pawnw2,
-    pawnw3,
-    pawnw4,
-    pawnw5,
-    pawnw6,
-    pawnw7,
-    pawnw8,
-    rookwl,
-    knightwl,
-    bishopwl,
-    kingw,
-    queenw,
-    rookwr,
-    knightwr,
-    bishopwr,
+    pawn_ = 1,
+    rook_,
+    knight_,
+    bishop_,
+    king_,
+    queen_,
 };
 
 class pieces
 {
+    // char name[2];
+    int name;
     coordinates position;
     bool iswhite; // Black for 0 , white:1
 public:
     void setposition(coordinates a);
-    // void possiblemove();
     coordinates getposition();
+    void setname(int);
+    int getname();
     bool getcolor();
     void setcolor(bool);
     // void possiblemove();
-    void move(coordinates);
+    virtual void move(coordinates) {}
 };
 
 /***************************************DERIVED CLASSES**********************************/
@@ -60,12 +38,10 @@ public:
 class pawn : public pieces
 {
     bool firstMove;
-    
 
 public:
     pawn(bool, int);
-    void setposition(coordinates);
-    // void move(coordinates);
+    void move(coordinates);
     // void possiblemove();
     // pawn();
 };
@@ -73,33 +49,32 @@ class queen : public pieces
 {
 public:
     queen(bool);
-    void setposition(coordinates a);
-    // void move(coordinates);
+    void move(coordinates);
 };
 
 class king : public pieces
 {
+    bool firstMove;
+
 public:
     king(bool);
-    void setposition(coordinates a);
-    // void move(coordinates);
+    void move(coordinates);
 };
 class knight : public pieces
 {
     bool isleft; // 0 for right and 1 for isleft
 public:
     knight(bool, bool);
-    void setposition(coordinates a);
-    // void move(coordinates);
+    void move(coordinates);
 };
 class rook : public pieces
 {
+    bool firstMove;
     bool isleft;
 
 public:
     rook(bool, bool);
-    void setposition(coordinates a);
-    // void move(coordinates);
+    void move(coordinates);
 };
 class bishop : public pieces
 {
@@ -107,8 +82,7 @@ class bishop : public pieces
 
 public:
     bishop(bool, bool);
-    void setposition(coordinates a);
-    // void move(coordinates);
+    void move(coordinates);
 };
 
 /***********************************PIECES FUNCTIONS**************************/
@@ -126,16 +100,19 @@ coordinates pieces::getposition()
 {
     return position;
 }
-void pieces::move(coordinates a)
+void pieces::setname(int a)
 {
-    coordinates x = getposition();
-    A[x.x][x.y] = 0;
-    setposition(a);
+    name = a;
+}
+int pieces::getname()
+{
+    return name;
 }
 
 /*************************************CONSTRUCTORS******************************/
 pawn ::pawn(bool c, int y)
 {
+    setname(pawn_);
     setcolor(c);
     firstMove = true;
     if (c)
@@ -155,6 +132,7 @@ pawn ::pawn(bool c, int y)
 // }
 queen ::queen(bool c)
 {
+    setname(queen_);
     setcolor(c);
     if (c)
         setposition({0, 4});
@@ -163,7 +141,9 @@ queen ::queen(bool c)
 }
 king ::king(bool c)
 {
+    setname(king_);
     setcolor(c);
+    firstMove = true;
     if (c)
         setposition({0, 3});
     else
@@ -171,6 +151,7 @@ king ::king(bool c)
 }
 knight ::knight(bool c, bool d)
 {
+    setname(knight_);
     setcolor(c);
     isleft = d;
     if (c && isleft)
@@ -184,6 +165,7 @@ knight ::knight(bool c, bool d)
 }
 bishop ::bishop(bool c, bool d)
 {
+    setname(bishop_);
     setcolor(c);
     isleft = d;
     if (c && isleft)
@@ -197,8 +179,10 @@ bishop ::bishop(bool c, bool d)
 }
 rook ::rook(bool c, bool d)
 {
+    setname(rook_);
     setcolor(c);
     isleft = d;
+    firstMove = true;
     if (c && isleft)
         setposition({0, 0});
     else if (c)
@@ -209,59 +193,44 @@ rook ::rook(bool c, bool d)
         setposition({7, 7});
 }
 
-/**********************************SETPOSITION***********************/
+/**********************************SETPOSITION******************************************/
 void pieces ::setposition(coordinates a)
 {
     position = a;
+    board[a.x][a.y] = this;
 }
 
-void pawn ::setposition(coordinates a)
+/****************************************MOVE*******************************************************/
+void pawn::move(coordinates a)
 {
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = pawnw;
-    else
-        A[a.x][a.y] = pawnb;
+    firstMove = false;
+    board[getposition().x][getposition().y] = 0;
+    setposition(a);
 }
-void queen::setposition(coordinates a)
+void queen::move(coordinates a)
 {
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = queenw;
-    else
-        A[a.x][a.y] = queenb;
+    board[getposition().x][getposition().y] = 0;
+    setposition(a);
 }
-void rook::setposition(coordinates a)
+void king::move(coordinates a)
 {
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = rookw;
-    else
-        A[a.x][a.y] = rookb;
+    firstMove = false;
+    board[getposition().x][getposition().y] = 0;
+    setposition(a);
 }
-void knight::setposition(coordinates a)
+void knight::move(coordinates a)
 {
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = knightw;
-    else
-        A[a.x][a.y] = knightb;
+    board[getposition().x][getposition().y] = 0;
+    setposition(a);
 }
-void bishop::setposition(coordinates a)
+void bishop::move(coordinates a)
 {
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = bishopw;
-    else
-        A[a.x][a.y] = bishopb;
+    board[getposition().x][getposition().y] = 0;
+    setposition(a);
 }
-void king::setposition(coordinates a)
+void rook::move(coordinates a)
 {
-    pieces::setposition(a);
-    if (getcolor())
-        A[a.x][a.y] = kingw;
-    else
-        A[a.x][a.y] = kingb;
+    firstMove = false;
+    board[getposition().x][getposition().y] = 0;
+    setposition(a);
 }
-
-/***************************************************/
