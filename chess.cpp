@@ -4,20 +4,28 @@ using namespace std;
 
 void DisplayBoard()
 {
-    // cout << "\033[2J\033[1;1H";
+    cout << "\033[2J\033[1;1H"
+         << "r\\c ";
+    for (int i = 0; i < 8; i++)
+        cout << setw(4) << i;
+    cout << "\n"
+         << "    ";
+    for (int i = 0; i < 8; i++)
+        cout << "----";
+    cout << "\n";
     for (int i = 0; i < 8; i++)
     {
+        cout << i << "  | ";
         for (int j = 0; j < 8; j++)
         {
             if (board[i][j] != 0)
             {
-                cout << setw(3) << board[i][j]->getname() << ((board[i][j]->getcolor())?'w':'b');
+                cout << setw(3) << board[i][j]->getname() << ((board[i][j]->getcolor()) ? 'w' : 'b');
             }
             else
             {
-                cout<<setw(4)<<0;
+                cout << setw(4) << 0;
             }
-            
         }
         cout << endl;
     }
@@ -25,21 +33,28 @@ void DisplayBoard()
 
 bool move(int a[4])
 {
-    if (board[a[0]][a[1]]!=0)
+    // vector<coordinates>::iterator it;
+    // it = find (board[a[0]][a[1]]->Node->begin()+1, board[a[0]][a[1]]->Node->end(), {a[2],a[3]});
+    // if(it!= board[a[0]][a[1]]->Node->end())
+    //     board[a[0]][a[1]]->move({a[2],a[3]});
+    // }
+    // else
+    //     cout<<"das baj gye kya>\n";
+    if (board[a[0]][a[1]] != 0)
     {
-        board[a[0]][a[1]]->move({a[2],a[3]});
+        board[a[0]][a[1]]->move({a[2], a[3]});
     }
+    n_move++;
     return 0;
 }
 
 void show_poss_move(int a[])
 {
-    if (board[a[0]][a[1]]!=0)
+    board[a[0]][a[1]]->possiblemove();
+    if (board[a[0]][a[1]] != 0)
     {
-        vector<coordinates> PM(board[a[0]][a[1]]->possiblemove());
-        // cout<<PM.
-        for (auto p : PM)
-            cout << p.x << " "<<p.y<<"\n";
+        for (auto p : *(board[a[0]][a[1]]->Node))
+            cout << p << "\n";
     }
 }
 
@@ -70,7 +85,6 @@ int main()
         cout << "Do you want to make another move(0/1) : ";
         cin >> n;
         cin.clear();
-
     } while (n);
 
     return 0;
