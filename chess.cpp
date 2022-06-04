@@ -1,11 +1,10 @@
 #include "pieces.cpp"
-#include <iostream>
 #include <iomanip>
 using namespace std;
 
 void DisplayBoard()
 {
-    cout << "\033[2J\033[1;1H";
+    // cout << "\033[2J\033[1;1H";
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -33,6 +32,17 @@ bool move(int a[4])
     return 0;
 }
 
+void show_poss_move(int a[])
+{
+    if (board[a[0]][a[1]]!=0)
+    {
+        vector<coordinates> PM(board[a[0]][a[1]]->possiblemove());
+        // cout<<PM.
+        for (auto p : PM)
+            cout << p.x << " "<<p.y<<"\n";
+    }
+}
+
 int main()
 {
     cout << "Hello World\n";
@@ -51,6 +61,7 @@ int main()
         cout << "Enter the position from which you want to move the piece : ";
         cin >> a[0] >> a[1];
         cin.clear();
+        show_poss_move(a);
         cout << "Enter the position where you want to move the piece : ";
         cin >> a[2] >> a[3];
         cin.clear();
