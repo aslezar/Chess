@@ -1,13 +1,21 @@
 #include <vector>
 #include <iostream>
 using namespace std;
+int n_move = 0;
 class pieces;
 pieces *board[8][8] = {0};
-struct coordinates
+class coordinates
 {
+public:
     int x; // row
     int y; // column
+    friend ostream &operator<<(ostream &os, coordinates &a);
 };
+ostream &operator<<(ostream &os, coordinates &a)
+{
+    os << a.x << " " << a.y;
+    return os;
+}
 
 enum piecenames
 {
@@ -21,28 +29,29 @@ enum piecenames
 
 class pieces
 {
-    // char name[2];
     int name;
     coordinates position;
     bool iswhite; // Black for 0 , white:1
+    int previous_move;
+
 public:
+    vector<coordinates> *Node;
+    //Functions of pieces
+    pieces();
     void setposition(coordinates a);
     coordinates getposition();
     void setname(int);
     int getname();
+    void setpreviousmove(int);
+    int getpreviousmove();
     bool getcolor();
     void setcolor(bool);
-    virtual vector<coordinates> possiblemove()
-    {
-        cout << "Sed";
-        coordinates a({1, 2});
-        vector<coordinates> p;
-        return p;
-    }
-    bool ispossible(coordinates);
-    virtual void move(coordinates) {}
-    vector<coordinates> possiblestraight();
-    vector<coordinates> possiblediagonally();
+    virtual void possiblemove() {}
+    virtual bool ispossible(coordinates);
+    // virtual void move(coordinates) {}
+    void possiblestraight();
+    void possiblediagonally();
+    virtual void move(coordinates);
 };
 
 /***************************************DERIVED CLASSES**********************************/
@@ -50,30 +59,28 @@ public:
 class pawn : public pieces
 {
     bool firstMove;
-
 public:
     pawn(bool, int);
     void move(coordinates);
-    vector<coordinates> possiblemove();
-    // void possiblemove();
-    // pawn();
+    void possiblemove();
 };
+
 class queen : public pieces
 {
 public:
     queen(bool);
     void move(coordinates);
-    vector<coordinates> possiblemove();
+    void possiblemove();
 };
 
 class king : public pieces
 {
     bool firstMove;
-
 public:
     king(bool);
     void move(coordinates);
 };
+
 class knight : public pieces
 {
     bool isleft; // 0 for right and 1 for isleft
@@ -81,37 +88,39 @@ public:
     knight(bool, bool);
     void move(coordinates);
 };
+
 class rook : public pieces
 {
     bool firstMove;
     bool isleft;
-
 public:
-    vector<coordinates> possiblemove();
     rook(bool, bool);
     void move(coordinates);
+    void possiblemove();
 };
+
 class bishop : public pieces
 {
     bool isleft;
-
 public:
     bishop(bool, bool);
     void move(coordinates);
-    vector<coordinates> possiblemove();
+    void possiblemove();
 };
 
-/***********************************PIECES FUNCTIONS**************************/
+/***********************************PIECES FUNCTIONS*****************************************/
+pieces ::pieces()
+{
+    previous_move = -1;
+}
 void pieces::setcolor(bool a)
 {
     iswhite = a;
 }
-
 bool pieces ::getcolor()
 {
     return iswhite;
 }
-
 coordinates pieces::getposition()
 {
     return position;
@@ -124,18 +133,27 @@ int pieces::getname()
 {
     return name;
 }
+void pieces::setpreviousmove(int x)
+{
+    previous_move = x;
+}
+int pieces::getpreviousmove()
+{
+    return previous_move;
+}
 bool pieces::ispossible(coordinates a)
 {
-    // if (board[a.x][a.y] != 0 && a.x<8 &&a.x>-1&& a.y<8 &&a.y>-1)
     if (board[a.x][a.y] != 0 || (a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0))
         return false;
-    // if (board[a.x][a.y] != 0 )
     return true;
 }
+void pieces::move(coordinates a) {
+    board[getposition().x][getposition().y] = 0;
+    setposition(a);
+}
 
-vector<coordinates> pieces::possiblestraight()
+void pieces::possiblestraight()
 {
-    vector<coordinates> PM;
     int i = 1;
     bool a, b, c, d;
     a = b = c = d = 1;
@@ -143,71 +161,69 @@ vector<coordinates> pieces::possiblestraight()
     {
         if (ispossible({getposition().x + i, getposition().y}) && a)
         {
-            PM.push_back({getposition().x + i, getposition().y});
+            Node->push_back({getposition().x + i, getposition().y});
         }
         else
             a = 0;
         if (ispossible({getposition().x - i, getposition().y}) && b)
         {
-            PM.push_back({getposition().x - i, getposition().y});
+            Node->push_back({getposition().x - i, getposition().y});
         }
         else
             b = 0;
         if (ispossible({getposition().x, getposition().y + i}) && c)
         {
-            PM.push_back({getposition().x, getposition().y + i});
+            Node->push_back({getposition().x, getposition().y + i});
         }
         else
             c = 0;
         if (ispossible({getposition().x, getposition().y - i}))
         {
-            PM.push_back({getposition().x, getposition().y - i});
+            Node->push_back({getposition().x, getposition().y - i});
         }
         else
             d = 0;
         i++;
     }
-    return PM;
 }
-vector<coordinates> pieces::possiblediagonally()
+void pieces::possiblediagonally()
 {
-    vector<coordinates> PM;
     int i = 1;
-    bool a, b,c,d;
+    bool a, b, c, d;
     a = b = c = d = 1;
     while (a || b || c || d)
     {
-        if (ispossible({getposition().x + i, getposition().y+i}) && a)
+        if (ispossible({getposition().x + i, getposition().y + i}) && a)
         {
-            PM.push_back({getposition().x + i, getposition().y+i});
+            Node->push_back({getposition().x + i, getposition().y + i});
         }
         else
             a = 0;
-        if (ispossible({getposition().x - i, getposition().y-i}) && b)
+        if (ispossible({getposition().x - i, getposition().y - i}) && b)
         {
-            PM.push_back({getposition().x - i, getposition().y-i});
+            Node->push_back({getposition().x - i, getposition().y - i});
         }
         else
             b = 0;
-        if (ispossible({getposition().x - i, getposition().y+i}) && c)
+        if (ispossible({getposition().x - i, getposition().y + i}) && c)
         {
-            PM.push_back({getposition().x - i, getposition().y+i});
+            Node->push_back({getposition().x - i, getposition().y + i});
         }
         else
             c = 0;
-        if (ispossible({getposition().x + i, getposition().y-i}) && d)
+        if (ispossible({getposition().x + i, getposition().y - i}) && d)
         {
-            PM.push_back({getposition().x + i, getposition().y-i});
+            Node->push_back({getposition().x + i, getposition().y - i});
         }
         else
             d = 0;
         i++;
     }
-    return PM;
 }
 /*************************************CONSTRUCTORS******************************/
 pawn ::pawn(bool c, int y)
 {
+    Node = new vector<coordinates>;
     setname(pawn_);
     setcolor(c);
     firstMove = true;
@@ -216,18 +232,10 @@ pawn ::pawn(bool c, int y)
     else
         setposition({6, y});
 }
-// bool pawn::possiblemove()
-// {
-//     if(firstMove)
-//     {
-//         if(A[a.x+2][y])
-//         {
-//             //Highlight
-//         }
-//     }
-// }
+
 queen ::queen(bool c)
 {
+    Node = new vector<coordinates>;
     setname(queen_);
     setcolor(c);
     if (c)
@@ -237,6 +245,7 @@ queen ::queen(bool c)
 }
 king ::king(bool c)
 {
+    Node = new vector<coordinates>;
     setname(king_);
     setcolor(c);
     firstMove = true;
@@ -247,6 +256,7 @@ king ::king(bool c)
 }
 knight ::knight(bool c, bool d)
 {
+    Node = new vector<coordinates>;
     setname(knight_);
     setcolor(c);
     isleft = d;
@@ -261,6 +271,7 @@ knight ::knight(bool c, bool d)
 }
 bishop ::bishop(bool c, bool d)
 {
+    Node = new vector<coordinates>;
     setname(bishop_);
     setcolor(c);
     isleft = d;
@@ -275,6 +286,7 @@ bishop ::bishop(bool c, bool d)
 }
 rook ::rook(bool c, bool d)
 {
+    Node = new vector<coordinates>;
     setname(rook_);
     setcolor(c);
     isleft = d;
@@ -300,69 +312,75 @@ void pieces ::setposition(coordinates a)
 void pawn::move(coordinates a)
 {
     firstMove = false;
-    board[getposition().x][getposition().y] = 0;
-    setposition(a);
+    pieces::move(a);
 }
 void queen::move(coordinates a)
 {
-    board[getposition().x][getposition().y] = 0;
-    setposition(a);
+    pieces::move(a);
 }
 void king::move(coordinates a)
 {
     firstMove = false;
-    board[getposition().x][getposition().y] = 0;
-    setposition(a);
+    pieces::move(a);
 }
 void knight::move(coordinates a)
 {
-    board[getposition().x][getposition().y] = 0;
-    setposition(a);
+    pieces::move(a);
 }
 void bishop::move(coordinates a)
 {
-    board[getposition().x][getposition().y] = 0;
-    setposition(a);
+    pieces::move(a);
 }
 void rook::move(coordinates a)
 {
     firstMove = false;
-    board[getposition().x][getposition().y] = 0;
-    setposition(a);
+    pieces::move(a);
 }
-/***********************************/
-vector<coordinates> pawn::possiblemove()
+/*********************************************POSSIBLE MOVE****************************************************/
+void pawn::possiblemove()
 {
-    vector<coordinates> PM;
-    if (ispossible({getposition().x + 1, getposition().y}))
+    if (getpreviousmove() != n_move)
     {
-        PM.push_back({getposition().x + 1, getposition().y});
-        if (firstMove)
+        Node->erase(Node->begin(), Node->end());
+        int i = getcolor() ? 1 : -1;
+        if (ispossible({getposition().x + 1 * i, getposition().y}))
         {
-            if (ispossible({getposition().x + 2, getposition().y}))
+            Node->push_back({getposition().x + 1 * i, getposition().y});
+            if ((ispossible({getposition().x + 2 * i, getposition().y})) && firstMove)
             {
-
-                PM.push_back({getposition().x + 2, getposition().y});
+                Node->push_back({getposition().x + 2 * i, getposition().y});
             }
         }
+        setpreviousmove(n_move);
     }
-
-    return PM;
 }
-vector<coordinates> rook::possiblemove() {
-    return possiblestraight();
-}
-
-vector<coordinates> bishop::possiblemove()
+void rook::possiblemove()
 {
-    return possiblediagonally();
+    if (getpreviousmove() != n_move)
+    {
+        Node->erase(Node->begin(), Node->end());
+        possiblestraight();
+        setpreviousmove(n_move);
+    }
 }
-vector<coordinates> queen::possiblemove() {
-    vector<coordinates> PM(possiblestraight());
-    vector<coordinates> pm2(possiblediagonally());
-    for (unsigned i=0; i<pm2.size(); i++)
-    PM.push_back(pm2.at(i));
-    
-    return PM;
+
+void bishop::possiblemove()
+{
+    if (getpreviousmove() != n_move)
+    {
+        Node->erase(Node->begin(), Node->end());
+        possiblediagonally();
+        setpreviousmove(n_move);
+    }
 }
-//MOVES CHANGE THE FNXS
+void queen::possiblemove()
+{
+    if (getpreviousmove() != n_move)
+    {
+        Node->erase(Node->begin(), Node->end());
+        possiblestraight();
+        possiblediagonally();
+        setpreviousmove(n_move);
+    }
+}
+//Knight, King
