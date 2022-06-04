@@ -1,3 +1,6 @@
+#include <vector>
+#include <iostream>
+using namespace std;
 class pieces;
 pieces *board[8][8] = {0};
 struct coordinates
@@ -29,8 +32,17 @@ public:
     int getname();
     bool getcolor();
     void setcolor(bool);
-    // void possiblemove();
+    virtual vector<coordinates> possiblemove()
+    {
+        cout << "Sed";
+        coordinates a({1, 2});
+        vector<coordinates> p;
+        return p;
+    }
+    bool ispossible(coordinates);
     virtual void move(coordinates) {}
+    vector<coordinates> possiblestraight();
+    vector<coordinates> possiblediagonally();
 };
 
 /***************************************DERIVED CLASSES**********************************/
@@ -42,6 +54,7 @@ class pawn : public pieces
 public:
     pawn(bool, int);
     void move(coordinates);
+    vector<coordinates> possiblemove();
     // void possiblemove();
     // pawn();
 };
@@ -50,6 +63,7 @@ class queen : public pieces
 public:
     queen(bool);
     void move(coordinates);
+    vector<coordinates> possiblemove();
 };
 
 class king : public pieces
@@ -73,6 +87,7 @@ class rook : public pieces
     bool isleft;
 
 public:
+    vector<coordinates> possiblemove();
     rook(bool, bool);
     void move(coordinates);
 };
@@ -83,6 +98,7 @@ class bishop : public pieces
 public:
     bishop(bool, bool);
     void move(coordinates);
+    vector<coordinates> possiblemove();
 };
 
 /***********************************PIECES FUNCTIONS**************************/
@@ -108,7 +124,87 @@ int pieces::getname()
 {
     return name;
 }
+bool pieces::ispossible(coordinates a)
+{
+    // if (board[a.x][a.y] != 0 && a.x<8 &&a.x>-1&& a.y<8 &&a.y>-1)
+    if (board[a.x][a.y] != 0 || (a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0))
+        return false;
+    // if (board[a.x][a.y] != 0 )
+    return true;
+}
 
+vector<coordinates> pieces::possiblestraight()
+{
+    vector<coordinates> PM;
+    int i = 1;
+    bool a, b, c, d;
+    a = b = c = d = 1;
+    while (a || b || c || d)
+    {
+        if (ispossible({getposition().x + i, getposition().y}) && a)
+        {
+            PM.push_back({getposition().x + i, getposition().y});
+        }
+        else
+            a = 0;
+        if (ispossible({getposition().x - i, getposition().y}) && b)
+        {
+            PM.push_back({getposition().x - i, getposition().y});
+        }
+        else
+            b = 0;
+        if (ispossible({getposition().x, getposition().y + i}) && c)
+        {
+            PM.push_back({getposition().x, getposition().y + i});
+        }
+        else
+            c = 0;
+        if (ispossible({getposition().x, getposition().y - i}))
+        {
+            PM.push_back({getposition().x, getposition().y - i});
+        }
+        else
+            d = 0;
+        i++;
+    }
+    return PM;
+}
+vector<coordinates> pieces::possiblediagonally()
+{
+    vector<coordinates> PM;
+    int i = 1;
+    bool a, b,c,d;
+    a = b = c = d = 1;
+    while (a || b || c || d)
+    {
+        if (ispossible({getposition().x + i, getposition().y+i}) && a)
+        {
+            PM.push_back({getposition().x + i, getposition().y+i});
+        }
+        else
+            a = 0;
+        if (ispossible({getposition().x - i, getposition().y-i}) && b)
+        {
+            PM.push_back({getposition().x - i, getposition().y-i});
+        }
+        else
+            b = 0;
+        if (ispossible({getposition().x - i, getposition().y+i}) && c)
+        {
+            PM.push_back({getposition().x - i, getposition().y+i});
+        }
+        else
+            c = 0;
+        if (ispossible({getposition().x + i, getposition().y-i}) && d)
+        {
+            PM.push_back({getposition().x + i, getposition().y-i});
+        }
+        else
+            d = 0;
+        i++;
+    }
+    return PM;
+}
 /*************************************CONSTRUCTORS******************************/
 pawn ::pawn(bool c, int y)
 {
@@ -234,3 +330,39 @@ void rook::move(coordinates a)
     board[getposition().x][getposition().y] = 0;
     setposition(a);
 }
+/***********************************/
+vector<coordinates> pawn::possiblemove()
+{
+    vector<coordinates> PM;
+    if (ispossible({getposition().x + 1, getposition().y}))
+    {
+        PM.push_back({getposition().x + 1, getposition().y});
+        if (firstMove)
+        {
+            if (ispossible({getposition().x + 2, getposition().y}))
+            {
+
+                PM.push_back({getposition().x + 2, getposition().y});
+            }
+        }
+    }
+
+    return PM;
+}
+vector<coordinates> rook::possiblemove() {
+    return possiblestraight();
+}
+
+vector<coordinates> bishop::possiblemove()
+{
+    return possiblediagonally();
+}
+vector<coordinates> queen::possiblemove() {
+    vector<coordinates> PM(possiblestraight());
+    vector<coordinates> pm2(possiblediagonally());
+    for (unsigned i=0; i<pm2.size(); i++)
+    PM.push_back(pm2.at(i));
+    
+    return PM;
+}
+//MOVES CHANGE THE FNXS
