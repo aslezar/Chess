@@ -1,15 +1,14 @@
 #include <vector>
+#include <list>
 #include <iostream>
 using namespace std;
 int n_move = 0;
 class pieces;
 pieces *board[8][8] = {0};
-class coordinates
+struct coordinates
 {
-public:
     int x; // row
     int y; // column
-    friend ostream &operator<<(ostream &os, coordinates &a);
 };
 ostream &operator<<(ostream &os, coordinates &a)
 {
@@ -33,10 +32,11 @@ class pieces
     coordinates position;
     bool iswhite; // Black for 0 , white:1
     int previous_move;
+    bool cantjump;
 
 public:
     vector<coordinates> *Node;
-    //Functions of pieces
+    // Functions of pieces
     pieces();
     void setposition(coordinates a);
     coordinates getposition();
@@ -47,6 +47,7 @@ public:
     bool getcolor();
     void setcolor(bool);
     virtual void possiblemove() {}
+    virtual bool ispossible(coordinates,bool&);
     virtual bool ispossible(coordinates);
     // virtual void move(coordinates) {}
     void possiblestraight();
@@ -59,6 +60,7 @@ public:
 class pawn : public pieces
 {
     bool firstMove;
+
 public:
     pawn(bool, int);
     void move(coordinates);
@@ -76,9 +78,11 @@ public:
 class king : public pieces
 {
     bool firstMove;
+
 public:
     king(bool);
     void move(coordinates);
+    void possiblemove();
 };
 
 class knight : public pieces
@@ -87,12 +91,14 @@ class knight : public pieces
 public:
     knight(bool, bool);
     void move(coordinates);
+    void possiblemove();
 };
 
 class rook : public pieces
 {
     bool firstMove;
     bool isleft;
+
 public:
     rook(bool, bool);
     void move(coordinates);
@@ -102,6 +108,7 @@ public:
 class bishop : public pieces
 {
     bool isleft;
+
 public:
     bishop(bool, bool);
     void move(coordinates);
@@ -112,6 +119,7 @@ public:
 pieces ::pieces()
 {
     previous_move = -1;
+    cantjump=0;
 }
 void pieces::setcolor(bool a)
 {
@@ -141,13 +149,46 @@ int pieces::getpreviousmove()
 {
     return previous_move;
 }
+
 bool pieces::ispossible(coordinates a)
 {
     if (board[a.x][a.y] != 0 || (a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0))
         return false;
     return true;
 }
-void pieces::move(coordinates a) {
+
+bool pieces::ispossible(coordinates a, bool &find)
+{
+    if (name!=pawn_)
+    {
+        if (a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0)
+            return false;
+        if(board[a.x][a.y]!=0)
+        {
+            if(board[a.x][a.y]->getcolor()!=iswhite)
+            {
+                find=false;
+                return true;
+            }
+            return false;
+        }
+        // else if (board[a.x][a.y] != 0&&cantjump==false)
+        // {
+        //     cantjump=1;
+        //     return true;
+        // }
+        // return false;
+    }
+    else
+    {
+        if (board[a.x][a.y] != 0||a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0)
+            return false;
+    }
+    
+    return true;
+}
+void pieces::move(coordinates a)
+{
     board[getposition().x][getposition().y] = 0;
     setposition(a);
 }
@@ -156,30 +197,39 @@ void pieces::possiblestraight()
 {
     int i = 1;
     bool a, b, c, d;
+    bool a1, b1, c1, d1;
     a = b = c = d = 1;
+    a1 = b1 = c1 = d1 = 1;
+    coordinates pos=getposition();
     while (a || b || c || d)
     {
-        if (ispossible({getposition().x + i, getposition().y}) && a)
+        if (a1 && ispossible({pos.x + i, pos.y},a1) && a)
         {
-            Node->push_back({getposition().x + i, getposition().y});
+            Node->push_back({pos.x + i, pos.y});
         }
         else
             a = 0;
-        if (ispossible({getposition().x - i, getposition().y}) && b)
+
+
+        if (b1 && ispossible({pos.x - i, pos.y},b1) && b)
         {
-            Node->push_back({getposition().x - i, getposition().y});
+            Node->push_back({pos.x - i, pos.y});
         }
         else
             b = 0;
-        if (ispossible({getposition().x, getposition().y + i}) && c)
+
+
+        if (c1 && ispossible({pos.x, pos.y + i},c1) && c)
         {
-            Node->push_back({getposition().x, getposition().y + i});
+            Node->push_back({pos.x, pos.y + i});
         }
         else
             c = 0;
-        if (ispossible({getposition().x, getposition().y - i}))
+
+
+        if (d1 && ispossible({pos.x, pos.y - i},d1) && d )
         {
-            Node->push_back({getposition().x, getposition().y - i});
+            Node->push_back({pos.x, pos.y - i});
         }
         else
             d = 0;
@@ -190,28 +240,30 @@ void pieces::possiblediagonally()
 {
     int i = 1;
     bool a, b, c, d;
+    bool a1, b1, c1, d1;
     a = b = c = d = 1;
+    a1 = b1 = c1 = d1 = 1;
     while (a || b || c || d)
     {
-        if (ispossible({getposition().x + i, getposition().y + i}) && a)
+        if (a1 && ispossible({getposition().x + i, getposition().y + i},a1) && a)
         {
             Node->push_back({getposition().x + i, getposition().y + i});
         }
         else
             a = 0;
-        if (ispossible({getposition().x - i, getposition().y - i}) && b)
+        if (b1 && ispossible({getposition().x - i, getposition().y - i},b1) && b)
         {
             Node->push_back({getposition().x - i, getposition().y - i});
         }
         else
             b = 0;
-        if (ispossible({getposition().x - i, getposition().y + i}) && c)
+        if (c1 && ispossible({getposition().x - i, getposition().y + i},c1) && c)
         {
             Node->push_back({getposition().x - i, getposition().y + i});
         }
         else
             c = 0;
-        if (ispossible({getposition().x + i, getposition().y - i}) && d)
+        if (d1 && ispossible({getposition().x + i, getposition().y - i},d1) && d)
         {
             Node->push_back({getposition().x + i, getposition().y - i});
         }
@@ -351,6 +403,14 @@ void pawn::possiblemove()
                 Node->push_back({getposition().x + 2 * i, getposition().y});
             }
         }
+        if (ispossible({getposition().x + 1 * i, getposition().y+1}))
+        {
+            Node->push_back({getposition().x + 1 * i, getposition().y+1});
+        }
+        if (ispossible({getposition().x + 1 * i, getposition().y-1}))
+        {
+            Node->push_back({getposition().x + 1 * i, getposition().y-1});
+        }
         setpreviousmove(n_move);
     }
 }
@@ -383,4 +443,48 @@ void queen::possiblemove()
         setpreviousmove(n_move);
     }
 }
-//Knight, King
+void king::possiblemove()
+{
+    if (getpreviousmove() != n_move)
+    {
+        // Castling remaining
+        Node->erase(Node->begin(), Node->end());
+        // int a,b;
+        for (int i = -1; i < 2; i++)
+        {
+            for (int j = -1; j < 2; j++)
+            {
+                if ((i != 0 || j != 0) && (ispossible({getposition().x + i, getposition().y + j})))
+                {
+                    Node->push_back({getposition().x + i, getposition().y + j});
+                }
+            }
+        }
+        setpreviousmove(n_move);
+    }
+}
+void knight::possiblemove()
+{
+    if (getpreviousmove() != n_move)
+    {
+        // Castling remaining
+        Node->erase(Node->begin(), Node->end());
+        for (int i = -2; i <= 2; i += 4)
+        {
+            for (int j = -1; j <= 1; j += 2)
+            {
+                if (ispossible({getposition().x + i, getposition().y + j}))
+                {
+                    Node->push_back({getposition().x + i, getposition().y + j});
+                }
+                if (ispossible({getposition().x + j, getposition().y + i}))
+                {
+                    Node->push_back({getposition().x + j, getposition().y + i});
+                }
+            }
+        }
+        setpreviousmove(n_move);
+    }
+}
+// Pawn cuts diagonally
+// Castling remaining
