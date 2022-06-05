@@ -4,8 +4,8 @@ using namespace std;
 
 void DisplayBoard()
 {
-    cout << "\033[2J\033[1;1H"
-         << "r\\c ";
+    cout << "\033[2J\033[1;1H";
+    cout << "r\\c ";
     for (int i = 0; i < 8; i++)
         cout << setw(4) << i;
     cout << "\n"
@@ -33,17 +33,20 @@ void DisplayBoard()
 
 bool move(int a[4])
 {
-    // vector<coordinates>::iterator it;
-    // it = find (board[a[0]][a[1]]->Node->begin()+1, board[a[0]][a[1]]->Node->end(), {a[2],a[3]});
-    // if(it!= board[a[0]][a[1]]->Node->end())
-    //     board[a[0]][a[1]]->move({a[2],a[3]});
+    // int k=0;
+    // for (int i = 0; i < board[a[0]][a[1]]->Node->size(); i++)
+    // {
+    //     if(board[a[0]][a[1]]->Node->at(i).x==a[2]&&board[a[0]][a[1]]->Node->at(i).y==a[3]) {
+    //         k=1;
+    //         break;
+    //     }
+    // }
+    // if (k)
+    // {
+        board[a[0]][a[1]]->move({a[2],a[3]});
     // }
     // else
-    //     cout<<"das baj gye kya>\n";
-    if (board[a[0]][a[1]] != 0)
-    {
-        board[a[0]][a[1]]->move({a[2], a[3]});
-    }
+    //     cout<<"das baj gye kya?\n";
     n_move++;
     return 0;
 }
