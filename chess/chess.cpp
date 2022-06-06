@@ -26,9 +26,15 @@ void DisplayBoard()
             {
                 cout << setw(4) << 0;
             }
+
         }
         cout << endl;
     }
+    for (int i = 0; i < n_move; i++)
+    {
+        cout<<pgn.at(i);
+    }
+    cout<<"\n";    
 }
 
 bool move(int a[4])
@@ -47,7 +53,6 @@ bool move(int a[4])
     // }
     // else
     //     cout<<"das baj gye kya?\n";
-    n_move++;
     return 0;
 }
 
