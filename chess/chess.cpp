@@ -43,7 +43,7 @@ bool move(int a[4])
     // }
     // if (k)
     // {
-        board[a[0]][a[1]]->move({a[2],a[3]});
+    board[a[0]][a[1]]->move({a[2], a[3]});
     // }
     // else
     //     cout<<"das baj gye kya?\n";
@@ -51,13 +51,18 @@ bool move(int a[4])
     return 0;
 }
 
-void show_poss_move(int a[])
+bool show_poss_move(int a[])
 {
-    board[a[0]][a[1]]->possiblemove();
     if (board[a[0]][a[1]] != 0)
     {
+        board[a[0]][a[1]]->possiblemove();
         for (auto p : *(board[a[0]][a[1]]->Node))
             cout << p << "\n";
+        return true;
+    }
+    else {
+        cout<<"Not a valid position.\n";
+        return false;
     }
 }
 
@@ -71,15 +76,19 @@ int main()
     knight blknight(0, 1), brknight(0, 0), wlknight(1, 1), wrknight(1, 0);
     bishop blbishop(0, 1), brbishop(0, 0), wlbishop(1, 1), wrbishop(1, 0);
     rook blrook(0, 1), brrook(0, 0), wlrook(1, 1), wrrook(1, 0);
+    // vector<pieces> * wpieces((pieces *)wpawn);
     DisplayBoard();
-    bool n = 0;
+    bool n = 1;
     int a[4];
     do
     {
         cout << "Enter the position from which you want to move the piece : ";
         cin >> a[0] >> a[1];
         cin.clear();
-        show_poss_move(a);
+        if (!show_poss_move(a))
+        {
+            continue;
+        }
         cout << "Enter the position where you want to move the piece : ";
         cin >> a[2] >> a[3];
         cin.clear();
