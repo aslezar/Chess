@@ -12,9 +12,23 @@ struct coordinates
 };
 ostream &operator<<(ostream &os, coordinates &a)
 {
-    os << a.x << " " << a.y;
+    os << '(' << a.x << ',' << a.y << ')';
     return os;
 }
+
+struct PGN
+{
+    int moveno;
+    int name;
+    coordinates initial;
+    coordinates final;
+};
+ostream &operator<<(ostream &os, PGN &a)
+{
+    os << a.moveno << ". " << a.name << " " << a.initial << " --> " << a.final << "    ";
+    return os;
+}
+vector<PGN> pgn;
 
 enum piecenames
 {
@@ -77,7 +91,7 @@ public:
 
 class king : public pieces
 {
-    public:
+public:
     king(bool);
     void move(coordinates);
     void possiblemove();
@@ -145,11 +159,13 @@ int pieces::getpreviousmove()
 {
     return previous_move;
 }
-bool pieces::getfirstMove() {
+bool pieces::getfirstMove()
+{
     return firstMove;
 }
-void pieces::setfirstMove(bool firstMove) {
-    this->firstMove=firstMove;
+void pieces::setfirstMove(bool firstMove)
+{
+    this->firstMove = firstMove;
 }
 
 bool pieces::ispossible(coordinates a)
@@ -176,7 +192,9 @@ bool pieces::ispossible(coordinates a, bool &find)
 }
 void pieces::move(coordinates a)
 {
+    n_move++;
     board[getposition().x][getposition().y] = 0;
+    pgn.push_back({n_move, name, getposition(), a});
     setposition(a);
 }
 
@@ -357,11 +375,13 @@ void queen::move(coordinates a)
 void king::move(coordinates a)
 {
     setfirstMove(false);
-    if(a.y==getposition().y-2) {
-        board[a.x][0]->move({a.x,2});
+    if (a.y == getposition().y - 2)
+    {
+        board[a.x][0]->move({a.x, 2});
     }
-    if(a.y==getposition().y+2) {
-        board[a.x][7]->move({a.x,4});
+    if (a.y == getposition().y + 2)
+    {
+        board[a.x][7]->move({a.x, 4});
     }
     pieces::move(a);
 }
@@ -385,23 +405,38 @@ void pawn::possiblemove()
     {
         Node->erase(Node->begin(), Node->end());
         int i = getcolor() ? 1 : -1;
-        if (ispossible({getposition().x + 1 * i, getposition().y}))
+        if (ispossible({getposition().x + i, getposition().y}))
         {
-            Node->push_back({getposition().x + 1 * i, getposition().y});
+            Node->push_back({getposition().x +i, getposition().y});
             if ((ispossible({getposition().x + 2 * i, getposition().y})) && getfirstMove())
             {
                 Node->push_back({getposition().x + 2 * i, getposition().y});
             }
         }
         bool useless = 1;
-        if (ispossible({getposition().x + 1 * i, getposition().y + 1}, useless))
+        if (ispossible({getposition().x + i, getposition().y + 1}, useless))
         {
-            Node->push_back({getposition().x + 1 * i, getposition().y + 1});
+            Node->push_back({getposition().x +  i, getposition().y + 1});
         }
-        if (ispossible({getposition().x + 1 * i, getposition().y - 1}, useless))
+        if (ispossible({getposition().x + i, getposition().y - 1}, useless))
         {
-            Node->push_back({getposition().x + 1 * i, getposition().y - 1});
+            Node->push_back({getposition().x + i, getposition().y - 1});
         }
+        if (getposition().x == ((i == 1) ? 4 : 3))
+        {
+            PGN lastmove = pgn.at(n_move - 1);
+            if (lastmove.name == pawn_)
+            {
+                for (int j = -1; j < 2; j+=2)
+                {
+                    if (lastmove.initial.y == getposition().y + j && lastmove.initial.x == ((i == 1) ? 6 : 1)&& lastmove.final.x == ((i == 1) ? 4 : 3))
+                    {
+                        Node->push_back({getposition().x + i , getposition().y + j});
+                    }
+                }
+            }
+        }
+
         setpreviousmove(n_move);
     }
 }
@@ -451,44 +486,43 @@ void king::possiblemove()
                 }
             }
         }
-        //Castling
+        // Castling
         if (getfirstMove())
         {
-            bool emptybetween1=1, emptybetween2=1;
+            bool emptybetween1 = 1, emptybetween2 = 1;
             int x = getposition().x;
-            if (board[x][0]!=0&&board[x][0]->getname()==rook_&&board[x][0]->getfirstMove())
+            if (board[x][0] != 0 && board[x][0]->getname() == rook_ && board[x][0]->getfirstMove())
             {
                 for (int i = 1; i < 3; i++)
                 {
-                    if (board[x][i]!=0)
+                    if (board[x][i] != 0)
                     {
-                        emptybetween1=false;
+                        emptybetween1 = false;
                         break;
-                    }                    
+                    }
                 }
-                //Check if there's check in between
+                // Check if there's check in between
                 if (emptybetween1)
                 {
                     Node->push_back({getposition().x, 1});
                 }
-                
             }
-            if (board[x][7]!=0&&board[x][7]->getname()==rook_&&board[x][7]->getfirstMove())
+            if (board[x][7] != 0 && board[x][7]->getname() == rook_ && board[x][7]->getfirstMove())
             {
                 for (int i = 4; i < 7; i++)
                 {
-                    if (board[x][i]!=0)
+                    if (board[x][i] != 0)
                     {
-                        emptybetween2=false;
+                        emptybetween2 = false;
                         break;
-                    }                    
+                    }
                 }
-                //Check if there's check in between
+                // Check if there's check in between
                 if (emptybetween2)
                 {
                     Node->push_back({getposition().x, 5});
                 }
-            }            
+            }
         }
 
         setpreviousmove(n_move);
@@ -518,5 +552,6 @@ void knight::possiblemove()
         setpreviousmove(n_move);
     }
 }
-//Check for checks everywhere everytime
-// en passant
+// Check for checks everywhere everytime
+//En Passant Move
+//Castling Check
