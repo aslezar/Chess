@@ -32,13 +32,13 @@ class pieces
     coordinates position;
     bool iswhite; // Black for 0 , white:1
     int previous_move;
-    bool cantjump;
+    bool firstMove;
 
 public:
     vector<coordinates> *Node;
     // Functions of pieces
     pieces();
-    void setposition(coordinates a);
+    void setposition(coordinates);
     coordinates getposition();
     void setname(int);
     int getname();
@@ -47,20 +47,20 @@ public:
     bool getcolor();
     void setcolor(bool);
     virtual void possiblemove() {}
-    virtual bool ispossible(coordinates,bool&);
+    virtual bool ispossible(coordinates, bool &);
     virtual bool ispossible(coordinates);
     // virtual void move(coordinates) {}
     void possiblestraight();
     void possiblediagonally();
     virtual void move(coordinates);
+    bool getfirstMove();
+    void setfirstMove(bool);
 };
 
 /***************************************DERIVED CLASSES**********************************/
 
 class pawn : public pieces
 {
-    bool firstMove;
-
 public:
     pawn(bool, int);
     void move(coordinates);
@@ -77,9 +77,7 @@ public:
 
 class king : public pieces
 {
-    bool firstMove;
-
-public:
+    public:
     king(bool);
     void move(coordinates);
     void possiblemove();
@@ -96,7 +94,6 @@ public:
 
 class rook : public pieces
 {
-    bool firstMove;
     bool isleft;
 
 public:
@@ -119,7 +116,6 @@ public:
 pieces ::pieces()
 {
     previous_move = -1;
-    cantjump=0;
 }
 void pieces::setcolor(bool a)
 {
@@ -149,6 +145,12 @@ int pieces::getpreviousmove()
 {
     return previous_move;
 }
+bool pieces::getfirstMove() {
+    return firstMove;
+}
+void pieces::setfirstMove(bool firstMove) {
+    this->firstMove=firstMove;
+}
 
 bool pieces::ispossible(coordinates a)
 {
@@ -159,33 +161,18 @@ bool pieces::ispossible(coordinates a)
 
 bool pieces::ispossible(coordinates a, bool &find)
 {
-    if (name!=pawn_)
+    if (a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0)
+        return false;
+    if (board[a.x][a.y] != 0)
     {
-        if (a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0)
-            return false;
-        if(board[a.x][a.y]!=0)
+        if (board[a.x][a.y]->getcolor() != iswhite)
         {
-            if(board[a.x][a.y]->getcolor()!=iswhite)
-            {
-                find=false;
-                return true;
-            }
-            return false;
+            find = false;
+            return true;
         }
-        // else if (board[a.x][a.y] != 0&&cantjump==false)
-        // {
-        //     cantjump=1;
-        //     return true;
-        // }
-        // return false;
+        return false;
     }
-    else
-    {
-        if (board[a.x][a.y] != 0||a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0)
-            return false;
-    }
-    
-    return true;
+    return (name == pawn_) ? false : true;
 }
 void pieces::move(coordinates a)
 {
@@ -200,34 +187,31 @@ void pieces::possiblestraight()
     bool a1, b1, c1, d1;
     a = b = c = d = 1;
     a1 = b1 = c1 = d1 = 1;
-    coordinates pos=getposition();
+    coordinates pos = getposition();
     while (a || b || c || d)
     {
-        if (a1 && ispossible({pos.x + i, pos.y},a1) && a)
+        if (a1 && ispossible({pos.x + i, pos.y}, a1) && a)
         {
             Node->push_back({pos.x + i, pos.y});
         }
         else
             a = 0;
 
-
-        if (b1 && ispossible({pos.x - i, pos.y},b1) && b)
+        if (b1 && ispossible({pos.x - i, pos.y}, b1) && b)
         {
             Node->push_back({pos.x - i, pos.y});
         }
         else
             b = 0;
 
-
-        if (c1 && ispossible({pos.x, pos.y + i},c1) && c)
+        if (c1 && ispossible({pos.x, pos.y + i}, c1) && c)
         {
             Node->push_back({pos.x, pos.y + i});
         }
         else
             c = 0;
 
-
-        if (d1 && ispossible({pos.x, pos.y - i},d1) && d )
+        if (d1 && ispossible({pos.x, pos.y - i}, d1) && d)
         {
             Node->push_back({pos.x, pos.y - i});
         }
@@ -245,25 +229,25 @@ void pieces::possiblediagonally()
     a1 = b1 = c1 = d1 = 1;
     while (a || b || c || d)
     {
-        if (a1 && ispossible({getposition().x + i, getposition().y + i},a1) && a)
+        if (a1 && ispossible({getposition().x + i, getposition().y + i}, a1) && a)
         {
             Node->push_back({getposition().x + i, getposition().y + i});
         }
         else
             a = 0;
-        if (b1 && ispossible({getposition().x - i, getposition().y - i},b1) && b)
+        if (b1 && ispossible({getposition().x - i, getposition().y - i}, b1) && b)
         {
             Node->push_back({getposition().x - i, getposition().y - i});
         }
         else
             b = 0;
-        if (c1 && ispossible({getposition().x - i, getposition().y + i},c1) && c)
+        if (c1 && ispossible({getposition().x - i, getposition().y + i}, c1) && c)
         {
             Node->push_back({getposition().x - i, getposition().y + i});
         }
         else
             c = 0;
-        if (d1 && ispossible({getposition().x + i, getposition().y - i},d1) && d)
+        if (d1 && ispossible({getposition().x + i, getposition().y - i}, d1) && d)
         {
             Node->push_back({getposition().x + i, getposition().y - i});
         }
@@ -278,7 +262,7 @@ pawn ::pawn(bool c, int y)
     Node = new vector<coordinates>;
     setname(pawn_);
     setcolor(c);
-    firstMove = true;
+    setfirstMove(true);
     if (c)
         setposition({1, y});
     else
@@ -300,7 +284,7 @@ king ::king(bool c)
     Node = new vector<coordinates>;
     setname(king_);
     setcolor(c);
-    firstMove = true;
+    setfirstMove(true);
     if (c)
         setposition({0, 3});
     else
@@ -342,7 +326,7 @@ rook ::rook(bool c, bool d)
     setname(rook_);
     setcolor(c);
     isleft = d;
-    firstMove = true;
+    setfirstMove(true);
     if (c && isleft)
         setposition({0, 0});
     else if (c)
@@ -363,7 +347,7 @@ void pieces ::setposition(coordinates a)
 /****************************************MOVE*******************************************************/
 void pawn::move(coordinates a)
 {
-    firstMove = false;
+    setfirstMove(false);
     pieces::move(a);
 }
 void queen::move(coordinates a)
@@ -372,7 +356,13 @@ void queen::move(coordinates a)
 }
 void king::move(coordinates a)
 {
-    firstMove = false;
+    setfirstMove(false);
+    if(a.y==getposition().y-2) {
+        board[a.x][0]->move({a.x,2});
+    }
+    if(a.y==getposition().y+2) {
+        board[a.x][7]->move({a.x,4});
+    }
     pieces::move(a);
 }
 void knight::move(coordinates a)
@@ -385,7 +375,7 @@ void bishop::move(coordinates a)
 }
 void rook::move(coordinates a)
 {
-    firstMove = false;
+    setfirstMove(false);
     pieces::move(a);
 }
 /*********************************************POSSIBLE MOVE****************************************************/
@@ -398,18 +388,19 @@ void pawn::possiblemove()
         if (ispossible({getposition().x + 1 * i, getposition().y}))
         {
             Node->push_back({getposition().x + 1 * i, getposition().y});
-            if ((ispossible({getposition().x + 2 * i, getposition().y})) && firstMove)
+            if ((ispossible({getposition().x + 2 * i, getposition().y})) && getfirstMove())
             {
                 Node->push_back({getposition().x + 2 * i, getposition().y});
             }
         }
-        if (ispossible({getposition().x + 1 * i, getposition().y+1}))
+        bool useless = 1;
+        if (ispossible({getposition().x + 1 * i, getposition().y + 1}, useless))
         {
-            Node->push_back({getposition().x + 1 * i, getposition().y+1});
+            Node->push_back({getposition().x + 1 * i, getposition().y + 1});
         }
-        if (ispossible({getposition().x + 1 * i, getposition().y-1}))
+        if (ispossible({getposition().x + 1 * i, getposition().y - 1}, useless))
         {
-            Node->push_back({getposition().x + 1 * i, getposition().y-1});
+            Node->push_back({getposition().x + 1 * i, getposition().y - 1});
         }
         setpreviousmove(n_move);
     }
@@ -423,7 +414,6 @@ void rook::possiblemove()
         setpreviousmove(n_move);
     }
 }
-
 void bishop::possiblemove()
 {
     if (getpreviousmove() != n_move)
@@ -450,16 +440,57 @@ void king::possiblemove()
         // Castling remaining
         Node->erase(Node->begin(), Node->end());
         // int a,b;
+        bool useless = 1;
         for (int i = -1; i < 2; i++)
         {
             for (int j = -1; j < 2; j++)
             {
-                if ((i != 0 || j != 0) && (ispossible({getposition().x + i, getposition().y + j})))
+                if ((i != 0 || j != 0) && (ispossible({getposition().x + i, getposition().y + j}, useless)))
                 {
                     Node->push_back({getposition().x + i, getposition().y + j});
                 }
             }
         }
+        //Castling
+        if (getfirstMove())
+        {
+            bool emptybetween1=1, emptybetween2=1;
+            int x = getposition().x;
+            if (board[x][0]!=0&&board[x][0]->getname()==rook_&&board[x][0]->getfirstMove())
+            {
+                for (int i = 1; i < 3; i++)
+                {
+                    if (board[x][i]!=0)
+                    {
+                        emptybetween1=false;
+                        break;
+                    }                    
+                }
+                //Check if there's check in between
+                if (emptybetween1)
+                {
+                    Node->push_back({getposition().x, 1});
+                }
+                
+            }
+            if (board[x][7]!=0&&board[x][7]->getname()==rook_&&board[x][7]->getfirstMove())
+            {
+                for (int i = 4; i < 7; i++)
+                {
+                    if (board[x][i]!=0)
+                    {
+                        emptybetween2=false;
+                        break;
+                    }                    
+                }
+                //Check if there's check in between
+                if (emptybetween2)
+                {
+                    Node->push_back({getposition().x, 5});
+                }
+            }            
+        }
+
         setpreviousmove(n_move);
     }
 }
@@ -469,15 +500,16 @@ void knight::possiblemove()
     {
         // Castling remaining
         Node->erase(Node->begin(), Node->end());
+        bool useless = 1;
         for (int i = -2; i <= 2; i += 4)
         {
             for (int j = -1; j <= 1; j += 2)
             {
-                if (ispossible({getposition().x + i, getposition().y + j}))
+                if (ispossible({getposition().x + i, getposition().y + j}, useless))
                 {
                     Node->push_back({getposition().x + i, getposition().y + j});
                 }
-                if (ispossible({getposition().x + j, getposition().y + i}))
+                if (ispossible({getposition().x + j, getposition().y + i}, useless))
                 {
                     Node->push_back({getposition().x + j, getposition().y + i});
                 }
@@ -486,5 +518,5 @@ void knight::possiblemove()
         setpreviousmove(n_move);
     }
 }
-// Pawn cuts diagonally
-// Castling remaining
+//Check for checks everywhere everytime
+// en passant
