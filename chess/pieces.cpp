@@ -15,6 +15,13 @@ ostream &operator<<(ostream &os, coordinates &a)
     os << '(' << a.x << ',' << a.y << ')';
     return os;
 }
+bool operator==(coordinates left, coordinates right) {
+    if (left.x==right.x&&left.y==right.y)
+    {
+        return true;
+    }
+    return false;
+}
 
 struct PGN
 {
@@ -29,7 +36,7 @@ ostream &operator<<(ostream &os, PGN &a)
     return os;
 }
 vector<PGN> pgn;
-
+bool isCheck(coordinates);
 enum piecenames
 {
     pawn_ = 1,
@@ -194,6 +201,11 @@ void pieces::move(coordinates a)
 {
     n_move++;
     board[getposition().x][getposition().y] = 0;
+    if (board[a.x][a.y] != 0)
+    {
+        board[a.x][a.y]->~pieces();
+    }
+
     pgn.push_back({n_move, name, getposition(), a});
     setposition(a);
 }
@@ -366,6 +378,57 @@ void pieces ::setposition(coordinates a)
 void pawn::move(coordinates a)
 {
     setfirstMove(false);
+    if (n_move > 1)
+    {
+        PGN lastmove = pgn.at(n_move - 1);
+        if (abs(lastmove.initial.y - getposition().y) == 1 && lastmove.initial.x == (getcolor() ? 6 : 1) && lastmove.final.x == (getcolor() ? 4 : 3))
+        {
+            board[lastmove.final.x][lastmove.initial.y]->~pieces();
+            board[lastmove.final.x][lastmove.initial.y] = 0;
+        }
+    }
+    if (a.x == (getcolor() ? 7 : 0))
+    {
+        char PromotedPiece;
+        do {
+            cout << "Into which piece you want to promote your pawn to?\n(r/q/b/k)";
+            cin >> PromotedPiece;
+            board[a.x][a.y]=0;
+        } while(PromotedPiece!='q'&&PromotedPiece!='r'&&PromotedPiece!='b'&&PromotedPiece!='k');
+        switch (PromotedPiece)
+        {
+        case 'r':
+        {
+            rook *r = new rook(getcolor(), true);
+            r->setposition({a.x, a.y});
+            this->~pawn();
+            return;
+        }
+        case 'q':
+        {
+            queen *q = new queen(getcolor());
+            q->setposition({a.x, a.y});
+            this->~pawn();
+            return;
+        }
+        case 'b':
+        {
+            bishop *b = new bishop(getcolor(), true);
+            b->setposition({a.x, a.y});
+            this->~pawn();
+            return;
+        }
+        case 'k':
+        {
+            knight *k = new knight(getcolor(), true);
+            k->setposition({a.x, a.y});
+            this->~pawn();
+            return;
+        }
+        default:
+            break;
+        }
+    }
     pieces::move(a);
 }
 void queen::move(coordinates a)
@@ -407,7 +470,7 @@ void pawn::possiblemove()
         int i = getcolor() ? 1 : -1;
         if (ispossible({getposition().x + i, getposition().y}))
         {
-            Node->push_back({getposition().x +i, getposition().y});
+            Node->push_back({getposition().x + i, getposition().y});
             if ((ispossible({getposition().x + 2 * i, getposition().y})) && getfirstMove())
             {
                 Node->push_back({getposition().x + 2 * i, getposition().y});
@@ -416,7 +479,7 @@ void pawn::possiblemove()
         bool useless = 1;
         if (ispossible({getposition().x + i, getposition().y + 1}, useless))
         {
-            Node->push_back({getposition().x +  i, getposition().y + 1});
+            Node->push_back({getposition().x + i, getposition().y + 1});
         }
         if (ispossible({getposition().x + i, getposition().y - 1}, useless))
         {
@@ -427,11 +490,11 @@ void pawn::possiblemove()
             PGN lastmove = pgn.at(n_move - 1);
             if (lastmove.name == pawn_)
             {
-                for (int j = -1; j < 2; j+=2)
+                for (int j = -1; j < 2; j += 2)
                 {
-                    if (lastmove.initial.y == getposition().y + j && lastmove.initial.x == ((i == 1) ? 6 : 1)&& lastmove.final.x == ((i == 1) ? 4 : 3))
+                    if (lastmove.initial.y == getposition().y + j && lastmove.initial.x == ((i == 1) ? 6 : 1) && lastmove.final.x == ((i == 1) ? 4 : 3))
                     {
-                        Node->push_back({getposition().x + i , getposition().y + j});
+                        Node->push_back({getposition().x + i, getposition().y + j});
                     }
                 }
             }
@@ -482,6 +545,10 @@ void king::possiblemove()
             {
                 if ((i != 0 || j != 0) && (ispossible({getposition().x + i, getposition().y + j}, useless)))
                 {
+                    if (isCheck({getposition().x + i, getposition().y + j}))
+                    {
+                        continue;
+                    }
                     Node->push_back({getposition().x + i, getposition().y + j});
                 }
             }
@@ -495,7 +562,7 @@ void king::possiblemove()
             {
                 for (int i = 1; i < 3; i++)
                 {
-                    if (board[x][i] != 0)
+                    if (board[x][i] != 0||isCheck({x,i}))
                     {
                         emptybetween1 = false;
                         break;
@@ -511,7 +578,7 @@ void king::possiblemove()
             {
                 for (int i = 4; i < 7; i++)
                 {
-                    if (board[x][i] != 0)
+                    if (board[x][i] != 0||isCheck({x,i}))
                     {
                         emptybetween2 = false;
                         break;
@@ -552,6 +619,9 @@ void knight::possiblemove()
         setpreviousmove(n_move);
     }
 }
+// To check for pins and checks in possible moves
+// If is check the possible move should counter check
 // Check for checks everywhere everytime
-//En Passant Move
-//Castling Check
+// Castling Check
+// Promotion of pawn
+// En Passant Move
