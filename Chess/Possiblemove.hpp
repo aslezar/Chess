@@ -1,4 +1,4 @@
-#include "DerivedClass.hpp"
+#include "Check.hpp"
 
 /*********************************************POSSIBLE MOVE****************************************************/
 void pawn::possiblemove()
@@ -48,7 +48,16 @@ void rook::possiblemove()
     {
         Node->erase(Node->begin(), Node->end());
         possiblestraight();
+        if (getcolor())
+        {
+            // Node = wking.ifCheckchecker(Node);
+        }
+        else
+        {
+            // Node = bking.ifCheck(Node);
+        }
         setpreviousmove(n_move);
+        ifCheckCaller();
     }
 }
 void bishop::possiblemove()
@@ -58,6 +67,7 @@ void bishop::possiblemove()
         Node->erase(Node->begin(), Node->end());
         possiblediagonally();
         setpreviousmove(n_move);
+        ifCheckCaller();
     }
 }
 void queen::possiblemove()
@@ -68,6 +78,7 @@ void queen::possiblemove()
         possiblestraight();
         possiblediagonally();
         setpreviousmove(n_move);
+        ifCheckCaller();
     }
 }
 void king::possiblemove()

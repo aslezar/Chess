@@ -24,6 +24,7 @@ public:
     king(bool);
     void move(coordinates);
     void possiblemove();
+    bool ifCheck();
 };
 
 class knight : public pieces
@@ -80,9 +81,13 @@ king ::king(bool c) : pieces(c)
     setname(king_);
     setfirstMove(true);
     if (c)
+    {
         setposition({0, 3});
+    }
     else
+    {
         setposition({7, 3});
+    }
 }
 knight ::knight(bool c, bool d) : pieces(c)
 {
@@ -154,7 +159,7 @@ void pawn::promote(coordinates a)
         cin >> PromotedPiece;
         board[a.x][a.y] = 0;
     } while (PromotedPiece != 'q' && PromotedPiece != 'r' && PromotedPiece != 'b' && PromotedPiece != 'k');
-    
+
     switch (PromotedPiece)
     {
     case 'r':
@@ -204,6 +209,7 @@ void king::move(coordinates a)
     {
         board[a.x][7]->move({a.x, 4});
     }
+
     pieces::move(a);
 }
 void knight::move(coordinates a)
