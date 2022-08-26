@@ -1,15 +1,6 @@
-#include "Check.hpp"
+#include "Possiblemove.hpp"
 #include <iomanip>
 using namespace std;
-
-/**********************DECLARATIONS**********************************************************/
-pawn wpawn[] = {pawn(1, 0), pawn(1, 1), pawn(1, 2), pawn(1, 3), pawn(1, 4), pawn(1, 5), pawn(1, 6), pawn(1, 7)};
-pawn bpawn[] = {pawn(0, 0), pawn(0, 1), pawn(0, 2), pawn(0, 3), pawn(0, 4), pawn(0, 5), pawn(0, 6), pawn(0, 7)};
-queen bqueen(0), wqueen(1);
-king bking(0), wking(1);
-knight blknight(0, 1), brknight(0, 0), wlknight(1, 1), wrknight(1, 0);
-bishop blbishop(0, 1), brbishop(0, 0), wlbishop(1, 1), wrbishop(1, 0);
-rook blrook(0, 1), brrook(0, 0), wlrook(1, 1), wrrook(1, 0);
 
 /*************************************FUNCTIONS*********************************************/
 // check whether it is a check when kings coordinates are given
@@ -22,7 +13,7 @@ rook blrook(0, 1), brrook(0, 0), wlrook(1, 1), wrrook(1, 0);
 //             if (board[i][j] != 0)
 //             {
 //                 if (n_move % 2 == board[i][j]->getcolor() && board[i][j]->getname() != king_)
-//                 {
+//                 {    
 //                     board[i][j]->possiblemove();
 //                     for (int k = 0; k < board[i][j]->Node->size(); k++)
 //                     {
@@ -261,3 +252,8 @@ int main()
 }
 
 /**********************************************************************/
+/*
+0 0 1 2 1
+7 4 3 0 1
+
+*/

@@ -46,6 +46,8 @@ ostream &operator<<(ostream &os, PGN &a)
     os << a.moveno << ". " << a.name << " " << a.initial << " --> " << a.final << "    ";
     return os;
 }
+
+/***************************Global Variables*******************************/
 vector<PGN> pgn;
 
 /**********************************PIECES************************************/
@@ -77,6 +79,8 @@ public:
     virtual void move(coordinates);
     bool getfirstMove();
     void setfirstMove(bool);
+    void ifCheckCaller();
+
     // void removecheckpoints();
     //     void ischeck();
 };
