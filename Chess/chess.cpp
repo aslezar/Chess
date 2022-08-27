@@ -1,150 +1,8 @@
 #include "Possiblemove.hpp"
-#include <iomanip>
 using namespace std;
 
 /*************************************FUNCTIONS*********************************************/
-// check whether it is a check when kings coordinates are given
-// bool isCheck(coordinates k_coord)
-// {
-//     for (int i = 0; i < 8; i++)
-//     {
-//         for (int j = 0; j < 8; j++)
-//         {
-//             if (board[i][j] != 0)
-//             {
-//                 if (n_move % 2 == board[i][j]->getcolor() && board[i][j]->getname() != king_)
-//                 {    
-//                     board[i][j]->possiblemove();
-//                     for (int k = 0; k < board[i][j]->Node->size(); k++)
-//                     {
-//                         // if (board[i][j]->Node->at(i)==(n_move%2?bking.getposition():wking.getposition()))
-//                         // {
-//                         //     return true;
-//                         // }
-//                         if (board[i][j]->Node->at(k) == k_coord)
-//                         {
-//                             return true;
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     return false;
-// }
-// bool isCheck2(coordinates from, coordinates to)
-// {
-//     pieces *boardcpy[8][8];
-//     for (int i = 0; i < 8; i++)
-//     {
-//         for (int j = 0; j < 8; j++)
-//         {
-//             boardcpy[i][j] = board[i][j];
-//         }
-//     }
-//     int Name = boardcpy[from.x][from.y]->getname();
-//     pieces* cpy;
 
-//     if (Name==1)
-//     {
-//         pawn* pcpy=new pawn(*(pawn *)boardcpy[from.x][from.y]);
-//         cpy=pcpy;
-//     }
-//     else if (Name==2)
-//     {
-//         rook* rcpy=new rook(*(rook *)boardcpy[from.x][from.y]);
-//         cpy=rcpy;
-//     }
-//     else if (Name==3)
-//     {
-//         knight* kcpy=new knight(*(knight *)boardcpy[from.x][from.y]);
-//         cpy=kcpy;
-//     }
-//     else if (Name==4)
-//     {
-//         bishop* bcpy=new bishop(*(bishop *)boardcpy[from.x][from.y]);
-//         cpy=bcpy;
-//     }
-//     else if (Name==5)
-//     {
-//         king* kicpy=new king(*(king *)boardcpy[from.x][from.y]);
-//         cpy=kicpy;
-//     }
-//     else if (Name==6)
-//     {
-//         queen* qcpy=new queen(*(queen *)boardcpy[from.x][from.y]);
-//         cpy=qcpy;
-//     }
-//     // white n_move even
-//     boardcpy[from.x][from.y] = cpy;
-//     boardcpy[from.x][from.y]->move(to);
-//     // white n_move odd
-//     for (int i = 0; i < 8; i++)
-//     {
-//         for (int j = 0; j < 8; j++)
-//         {
-//             if (board[i][j] != 0)
-//             {
-//                 // n_move odd
-//                 // getcolor black
-//                 coordinates k_coor = (n_move % 2) ? wking.getposition() : bking.getposition();
-//                 if (n_move % 2 != board[i][j]->getcolor() && board[i][j]->getname() != king_&&!(i==from.x&&j==from.y))
-//                 {
-//                     static int ctr=0;
-//                     cout<<++ctr<<" ctr\n";
-//                     cout<<i<<' '<<j<<'\n';
-//                     //check for color
-//                     board[i][j]->possiblemove();
-//                             cout<<"Inside";
-//                     for (int k = 0; k < board[i][j]->Node->size(); k++)
-//                     {
-//                         // if (board[i][j]->Node->at(i)==(n_move%2?bking.getposition():wking.getposition()))
-//                         // {
-//                         //     return true;
-//                         // }
-//                         if (board[i][j]->Node->at(k) == k_coor)
-//                         {
-//                             // delete cpy;
-//                             n_move--;
-//                             return true;
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     delete cpy;
-//     n_move--;
-//     return false;
-// }
-// bool kingisinCheck(coordinates k_coord)
-// {
-//     for (int i = 0; i < 8; i++)
-//     {
-//         for (int j = 0; j < 8; j++)
-//         {
-//             if (board[i][j] != 0)
-//             {
-//                 if (n_move % 2 == board[i][j]->getcolor())
-//                 {
-//                     board[i][j]->possiblemove();
-//                     for (int k = 0; k < board[i][j]->Node->size(); k++)
-//                     {
-//                         // if (board[i][j]->Node->at(i)==(n_move%2?bking.getposition():wking.getposition()))
-//                         // {
-//                         //     return true;
-//                         // }
-//                         if (board[i][j]->Node->at(k) == k_coord)
-//                         {
-//                             return true;
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     return false;
-// }
 void DisplayBoard()
 {
     // cout << "\033[2J\033[1;1H";
@@ -181,22 +39,15 @@ void DisplayBoard()
 
 bool move(int a[4])
 {
-
-    // bool k=false;
-    // for (int i = 0; i < board[a[0]][a[1]]->Node->size(); i++)
-    // {
-    //     if(board[a[0]][a[1]]->Node->at(i).x==a[2]&&board[a[0]][a[1]]->Node->at(i).y==a[3]) {
-    //         k=true;
-    //         break;
-    //     }
-    // }
-    // if (k)
-    // {
-    board[a[0]][a[1]]->move({a[2], a[3]});
-    // isCheck((n_move-1)%2?)
-    // }
-    // else
-    //     cout<<"das baj gye kya?\n";
+    for (auto &&i : board[a[0]][a[1]]->Node)
+    {
+        if (i == {a[2], a[3]})
+        {
+            board[a[0]][a[1]]->move({a[2], a[3]});
+            return 0;
+        }
+    }
+    cout << "Not a valid position\n";
     return 0;
 }
 
@@ -225,7 +76,6 @@ bool show_poss_move(int a[])
 int main()
 {
     cout << "Hello World\n";
-    // vector<pieces> * wpieces((pieces *)wpawn);
     DisplayBoard();
     bool n = 1;
     int a[4];
@@ -243,6 +93,11 @@ int main()
         cin.clear();
         move(a);
         DisplayBoard();
+        boardcopier();
+        if ((n_move & 1) ? (bking.ifCheck()) : (wking.ifCheck()))
+        {
+            cout << "************CHECK***************\n";
+        }
         cout << "Do you want to make another move(0/1) : ";
         cin >> n;
         cin.clear();
@@ -253,7 +108,6 @@ int main()
 
 /**********************************************************************/
 /*
-0 0 1 2 1
-7 4 3 0 1
 
+0 1 0 2 1 0 2 1 3 1 1 3 5 5 1 7 4 2 4 1
 */

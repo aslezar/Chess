@@ -24,7 +24,7 @@ public:
     king(bool);
     void move(coordinates);
     void possiblemove();
-    bool ifCheck();
+    bool ifCheck(bool,coordinates);
 };
 
 class knight : public pieces

@@ -1,6 +1,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
 int n_move = 0;
