@@ -48,14 +48,6 @@ void rook::possiblemove()
     {
         Node->erase(Node->begin(), Node->end());
         possiblestraight();
-        if (getcolor())
-        {
-            // Node = wking.ifCheckchecker(Node);
-        }
-        else
-        {
-            // Node = bking.ifCheck(Node);
-        }
         setpreviousmove(n_move);
         ifCheckCaller();
     }
@@ -85,9 +77,7 @@ void king::possiblemove()
 {
     if (getpreviousmove() != n_move)
     {
-        // Castling remaining
         Node->erase(Node->begin(), Node->end());
-        // int a,b;
         bool useless = 1;
         for (int i = -1; i < 2; i++)
         {
@@ -95,10 +85,6 @@ void king::possiblemove()
             {
                 if ((i != 0 || j != 0) && (ispossible({getposition().x + i, getposition().y + j}, useless)))
                 {
-                    // if (isCheck({getposition().x + i, getposition().y + j}))
-                    // {
-                    //     continue;
-                    // }
                     Node->push_back({getposition().x + i, getposition().y + j});
                 }
             }
@@ -106,6 +92,19 @@ void king::possiblemove()
         // Castling
         if (getfirstMove())
         {
+            bool flag1 = 0, flag5 = 0;
+            ifCheckCaller();
+            for (auto &&i : *Node)
+            {
+                if (i.y == 2)
+                {
+                    flag1 = 1;
+                }
+                else if (i.y == 4)
+                {
+                    flag5 = 1;
+                }
+            }
             bool emptybetween1 = 1, emptybetween2 = 1;
             int x = getposition().x;
             if (board[x][0] != 0 && board[x][0]->getname() == rook_ && board[x][0]->getfirstMove())
@@ -118,8 +117,7 @@ void king::possiblemove()
                         break;
                     }
                 }
-                // Check if there's check in between
-                if (emptybetween1)
+                if (emptybetween1 && flag1)
                 {
                     Node->push_back({getposition().x, 1});
                 }
@@ -134,8 +132,7 @@ void king::possiblemove()
                         break;
                     }
                 }
-                // Check if there's check in between
-                if (emptybetween2)
+                if (emptybetween2 && flag5)
                 {
                     Node->push_back({getposition().x, 5});
                 }
@@ -143,24 +140,13 @@ void king::possiblemove()
         }
 
         setpreviousmove(n_move);
+        ifCheckCaller();
     }
 }
-// void knight::possiblemove(bool a)
-// {
-//     if (getpreviousmove() != n_move)
-//     {
-//         // Castling remaining
-//         Node->erase(Node->begin(), Node->end());
-//         bool useless = 1;
-//         possiblemove();
-//         setpreviousmove(n_move);
-//     }
-// }
 void knight::possiblemove()
 {
     if (getpreviousmove() != n_move)
     {
-        // Castling remaining
         Node->erase(Node->begin(), Node->end());
         bool useless = 1;
         for (int i = -2; i <= 2; i += 4)
