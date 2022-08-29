@@ -16,7 +16,7 @@ struct coordinates
 };
 ostream &operator<<(ostream &os, coordinates &a)
 {
-    os << '(' << a.x << ',' << a.y << ')';
+    os<< '(' <<char('h'-a.y)<<" "<<a.x+1<< ')';
     return os;
 }
 bool operator==(coordinates &left, coordinates &right)

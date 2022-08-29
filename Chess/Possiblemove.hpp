@@ -38,7 +38,7 @@ void pawn::possiblemove()
                 }
             }
         }
-
+        ifCheckCaller();
         setpreviousmove(n_move);
     }
 }
@@ -163,6 +163,7 @@ void knight::possiblemove()
                 }
             }
         }
+        ifCheckCaller();
         setpreviousmove(n_move);
     }
 }

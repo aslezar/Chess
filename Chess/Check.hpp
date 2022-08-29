@@ -210,7 +210,6 @@ bool king::ifCheck(bool isking = 0, coordinates kpos = {0, 0})
     if (!isking)
     {
         check_pos = getposition();
-        cout<<"pos "<<check_pos<<'\n';
     }
     else
     {
