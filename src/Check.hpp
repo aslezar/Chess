@@ -1,16 +1,16 @@
 #include "DerivedClass.hpp"
 
 /*****************Global variables*********************/
-pawn wpawn[] = {pawn(1, 0), pawn(1, 1), pawn(1, 2), pawn(1, 3), pawn(1, 4), pawn(1, 5), pawn(1, 6), pawn(1, 7)};
-pawn bpawn[] = {pawn(0, 0), pawn(0, 1), pawn(0, 2), pawn(0, 3), pawn(0, 4), pawn(0, 5), pawn(0, 6), pawn(0, 7)};
-queen bqueen(0), wqueen(1);
-king bking(0), wking(1);
-knight blknight(0, 1), brknight(0, 0), wlknight(1, 1), wrknight(1, 0);
-bishop blbishop(0, 1), brbishop(0, 0), wlbishop(1, 1), wrbishop(1, 0);
-rook blrook(0, 1), brrook(0, 0), wlrook(1, 1), wrrook(1, 0);
+pawn wpawn[] = {pawn(1, 0), pawn(1, 1), pawn(1, 2), pawn(1, 3), pawn(1, 4), pawn(1, 5), pawn(1, 6), pawn(1, 7)};// white pawns
+pawn bpawn[] = {pawn(0, 0), pawn(0, 1), pawn(0, 2), pawn(0, 3), pawn(0, 4), pawn(0, 5), pawn(0, 6), pawn(0, 7)};// black pawns
+queen bqueen(0), wqueen(1);// black queen, white queen
+king bking(0), wking(1);// black king, white king
+knight blknight(0, 1), brknight(0, 0), wlknight(1, 1), wrknight(1, 0);// black left knight, black right knight, white left knight, white right knight
+bishop blbishop(0, 1), brbishop(0, 0), wlbishop(1, 1), wrbishop(1, 0);// black left bishop, black right bishop, white left bishop, white right bishop
+rook blrook(0, 1), brrook(0, 0), wlrook(1, 1), wrrook(1, 0);// black left rook, black right rook, white left rook, white right rook
 
-pieces *boardcpy[8][8];
-int is(coordinates a, bool clr)
+pieces *boardcpy[8][8];// copy of board
+int is(coordinates a, bool clr)// 0: empty, 1: enemy, 2: out of board, 3: friend
 {
     if (a.x > 7 || a.x < 0 || a.y > 7 || a.y < 0)
         return 2;
@@ -95,6 +95,7 @@ bool swest(coordinates check_pos, bool color)
     int state;
     while (!(state = is(check_pos, color)))
     {
+        check_pos.x--;
         check_pos.y++;
     }
     if (state == 2)
@@ -206,7 +207,7 @@ bool kingcheck(coordinates check_pos, bool clr)
 }
 bool king::ifCheck(bool isking = 0, coordinates kpos = {0, 0})
 {
-    coordinates check_pos;
+    coordinates check_pos;// position of king
     if (!isking)
     {
         check_pos = getposition();
@@ -215,7 +216,6 @@ bool king::ifCheck(bool isking = 0, coordinates kpos = {0, 0})
     {
         check_pos = kpos;
     }
-    // bool find = 1;
     if (east(check_pos, getcolor()))
         return 1;
     if (west(check_pos, getcolor()))
@@ -253,72 +253,31 @@ void boardcopier() {
 void pieces::ifCheckCaller()
 {
     vector<coordinates> *newNode = new vector<coordinates>;
-    boardcopier();
-    for (auto &&i : *Node)
+    boardcopier();// Copying board
+    for (auto &&i : *Node)// for each possible move
     {
         // position = i;
         boardcpy[getposition().x][getposition().y] = NULL;
-        boardcpy[i.x][i.y] = this;
+        boardcpy[i.x][i.y] = this;// moving piece
         // DisplayBoardcpy();
-        if (getcolor())
+        if (getcolor())// if white
         {
             if (!wking.ifCheck(getname() == king_, i))
             {
-                newNode->push_back(i);
+                newNode->push_back(i);// if not check, add to newNode
             }
         }
         else
         {
             if (!bking.ifCheck(getname() == king_, i))
             {
-                newNode->push_back(i);
+                newNode->push_back(i);// if not check, add to newNode
             }
         }
         boardcpy[getposition().x][getposition().y] = this;
-        boardcpy[i.x][i.y] = NULL;
+        boardcpy[i.x][i.y] = NULL;// moving piece back
     }
 
     swap(newNode, Node);
-    newNode->~vector();
+    newNode->~vector();// delete newNode;
 }
-
-
-
-
-
-
-/***********************************************************************************************************/
-// void DisplayBoardcpy()
-// {
-//     // cout << "\033[2J\033[1;1H";
-//     cout << "THIS IS BOARDCPY\n";
-//     cout << "r\\c ";
-//     for (int i = 0; i < 8; i++)
-//         cout << setw(4) << i;
-//     cout << "\n"
-//          << "    ";
-//     for (int i = 0; i < 8; i++)
-//         cout << "----";
-//     cout << "\n";
-//     for (int i = 0; i < 8; i++)
-//     {
-//         cout << i << "  | ";
-//         for (int j = 0; j < 8; j++)
-//         {
-//             if (boardcpy[i][j] != 0)
-//             {
-//                 cout << setw(3) << boardcpy[i][j]->getname() << ((boardcpy[i][j]->getcolor()) ? 'w' : 'b');
-//             }
-//             else
-//             {
-//                 cout << setw(4) << 0;
-//             }
-//         }
-//         cout << endl;
-//     }
-//     for (int i = 0; i < n_move; i++)
-//     {
-//         cout << pgn.at(i);
-//     }
-//     cout << "\n";
-// }

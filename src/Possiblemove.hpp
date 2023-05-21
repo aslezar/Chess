@@ -3,7 +3,7 @@
 /*********************************************POSSIBLE MOVE****************************************************/
 void pawn::possiblemove()
 {
-    if (getpreviousmove() != n_move)
+    if (getpreviousmove() != n_move)// if not already calculated
     {
         Node->erase(Node->begin(), Node->end());
         int i = getcolor() ? 1 : -1;
@@ -26,7 +26,7 @@ void pawn::possiblemove()
         }
         if (getposition().x == ((i == 1) ? 4 : 3))
         {
-            PGN lastmove = pgn.at(n_move - 1);
+            PGN lastmove = pgn.at(n_move - 1);// en passant
             if (lastmove.name == pawn_)
             {
                 for (int j = -1; j < 2; j += 2)
@@ -38,44 +38,44 @@ void pawn::possiblemove()
                 }
             }
         }
-        ifCheckCaller();
+        ifCheckCaller();// if check, remove those move
         setpreviousmove(n_move);
     }
 }
 void rook::possiblemove()
 {
-    if (getpreviousmove() != n_move)
+    if (getpreviousmove() != n_move)// if not already calculated
     {
         Node->erase(Node->begin(), Node->end());
         possiblestraight();
         setpreviousmove(n_move);
-        ifCheckCaller();
+        ifCheckCaller();// if check, remove those move
     }
 }
 void bishop::possiblemove()
 {
-    if (getpreviousmove() != n_move)
+    if (getpreviousmove() != n_move)// if not already calculated
     {
         Node->erase(Node->begin(), Node->end());
         possiblediagonally();
         setpreviousmove(n_move);
-        ifCheckCaller();
+        ifCheckCaller();// if check, remove those move
     }
 }
 void queen::possiblemove()
 {
-    if (getpreviousmove() != n_move)
+    if (getpreviousmove() != n_move)// if not already calculated
     {
         Node->erase(Node->begin(), Node->end());
         possiblestraight();
         possiblediagonally();
         setpreviousmove(n_move);
-        ifCheckCaller();
+        ifCheckCaller();// if check, remove those move
     }
 }
 void king::possiblemove()
 {
-    if (getpreviousmove() != n_move)
+    if (getpreviousmove() != n_move)// if not already calculated
     {
         Node->erase(Node->begin(), Node->end());
         bool useless = 1;
@@ -105,7 +105,7 @@ void king::possiblemove()
                     flag5 = 1;
                 }
             }
-            bool emptybetween1 = 1, emptybetween2 = 1;
+            bool emptybetween1 = 1, emptybetween2 = 1;// empty between king and rook
             int x = getposition().x;
             if (board[x][0] != 0 && board[x][0]->getname() == rook_ && board[x][0]->getfirstMove())
             {
@@ -140,12 +140,12 @@ void king::possiblemove()
         }
 
         setpreviousmove(n_move);
-        ifCheckCaller();
+        ifCheckCaller();// if check, remove those move
     }
 }
 void knight::possiblemove()
 {
-    if (getpreviousmove() != n_move)
+    if (getpreviousmove() != n_move)// if not already calculated
     {
         Node->erase(Node->begin(), Node->end());
         bool useless = 1;
@@ -163,7 +163,7 @@ void knight::possiblemove()
                 }
             }
         }
-        ifCheckCaller();
+        ifCheckCaller();// if check, remove those moves
         setpreviousmove(n_move);
     }
 }

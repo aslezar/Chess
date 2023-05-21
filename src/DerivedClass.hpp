@@ -137,20 +137,20 @@ void pawn::move(coordinates a)
     if (n_move > 1)
     {
         PGN lastmove = pgn.at(n_move - 1);
-        if (abs(lastmove.initial.y - getposition().y) == 1 && lastmove.initial.x == (getcolor() ? 6 : 1) && lastmove.final.x == (getcolor() ? 4 : 3))
+        if (abs(lastmove.initial.y - getposition().y) == 1 && lastmove.initial.x == (getcolor() ? 6 : 1) && lastmove.final.x == (getcolor() ? 4 : 3) && lastmove.final.y == a.y)// en passant
         {
             board[lastmove.final.x][lastmove.initial.y]->~pieces();
             board[lastmove.final.x][lastmove.initial.y] = 0;
         }
     }
-    if (a.x == (getcolor() ? 7 : 0))
+    if (a.x == (getcolor() ? 7 : 0))// promotion
     {
         promote(a);
         return;
     }
     pieces::move(a);
 }
-void pawn::promote(coordinates a)
+void pawn::promote(coordinates a)// promotion
 {
     char PromotedPiece;
     do
