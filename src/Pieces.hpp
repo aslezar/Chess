@@ -61,7 +61,7 @@ class pieces
     bool firstMove;
 
 public:
-    vector<coordinates> *Node;
+    vector<coordinates> *Node;// Possible moves
     // Functions of pieces
     pieces(bool);
     void setposition(coordinates);
@@ -160,7 +160,7 @@ void pieces::move(coordinates a)
     setposition(a);
 }
 
-void pieces::possiblestraight()
+void pieces::possiblestraight()// rook and queen
 {
     int i = 1;
     bool right, left, up, down;
@@ -200,7 +200,7 @@ void pieces::possiblestraight()
         i++;
     }
 }
-void pieces::possiblediagonally()
+void pieces::possiblediagonally()// bishop and queen
 {
     int i = 1;
     bool se, nw, sw, ne;
@@ -209,25 +209,25 @@ void pieces::possiblediagonally()
     find1 = find2 = find3 = find4 = 1;
     while (se || nw || sw || ne)
     {
-        if (find1 && ispossible({getposition().x + i, getposition().y + i}, find1) && se)
+        if (find1 && ispossible({getposition().x + i, getposition().y + i}, find1) && se)// se=>south east
         {
             Node->push_back({getposition().x + i, getposition().y + i});
         }
         else
             se = 0;
-        if (find2 && ispossible({getposition().x - i, getposition().y - i}, find2) && nw)
+        if (find2 && ispossible({getposition().x - i, getposition().y - i}, find2) && nw)// nw=>north west
         {
             Node->push_back({getposition().x - i, getposition().y - i});
         }
         else
             nw = 0;
-        if (find3 && ispossible({getposition().x - i, getposition().y + i}, find3) && sw)
+        if (find3 && ispossible({getposition().x - i, getposition().y + i}, find3) && sw)// sw=>south west
         {
             Node->push_back({getposition().x - i, getposition().y + i});
         }
         else
             sw = 0;
-        if (find4 && ispossible({getposition().x + i, getposition().y - i}, find4) && ne)
+        if (find4 && ispossible({getposition().x + i, getposition().y - i}, find4) && ne)// ne=>north east
         {
             Node->push_back({getposition().x + i, getposition().y - i});
         }
